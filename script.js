@@ -19,15 +19,15 @@ function Gameboard() {
         for (let j = 0; j < columns; j++) {
           board[i].push(ChangeCell());
         }
-      }
+      } // makes 3x3 board
     
     const getBoard = () => board;
 
     function makeMove(x, y, player) {
         if (board[x][y] > 0) { 
             console.log('Invalid move.');
-            // GameController().switchPlayerTurn(); switch back to same player?
-            return getBoard()}
+            return }
+
         board[x][y] = player;
         return getBoard();
     }
@@ -36,9 +36,14 @@ function Gameboard() {
         console.log(board)
     }
 
+    board[0][0] = 1;
+    board[1][1] = 1;
+
+
     return {
         makeMove,
-        printBoard
+        printBoard,
+        getBoard
     }
 };
 
@@ -46,7 +51,7 @@ function Gameboard() {
 // game.printBoard();
 
 function ChangeCell() {
-    let value = 0;
+    let value = 0; // !!!!!
 
     // const placeMarker = (player) => {
     //     value = player;
@@ -65,8 +70,8 @@ function ChangeCell() {
 };
 
 function GameController(
-    playerOneName = 'Player One',
-    playerTwoName = 'Player Two'
+    playerOneName = "Player One",
+    playerTwoName = "Player Two"
 ) {
     const board = Gameboard();
 
@@ -82,6 +87,7 @@ function GameController(
     ]
     
     let currentPlayer = players[0];
+    let endOfGame = false;
 
     const switchPlayerTurn = () => {
         currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
@@ -98,8 +104,8 @@ function GameController(
 
         board.makeMove(x, y, getCurrentPlayer().marker);
 
+        checkWinner(); // SEE IF FUNCTION WORKS HERE
         switchPlayerTurn();
-        // playerTurnMessage();
         printNextRound();
     }
 
@@ -108,10 +114,79 @@ function GameController(
         playerTurnMessage();
     }
 
+
+    const checkWinner = () => {
+        const currentGameBoard = board.getBoard();
+        const greaterZero = value => value > 0;
+        const gameOverMsg = `Game over. ${getCurrentPlayer().name} wins.`;
+
+
+        (function rowWin() {
+        for (let k = 0; k < currentGameBoard.length; k++) {    
+            if( currentGameBoard[k].every( el => el === currentGameBoard[k][0])
+            && currentGameBoard[k].every( el => el > 0) ) {
+                console.log(gameOverMsg);
+                return;
+            }
+        }
+    })();
+
+        (function columnWin() {
+            let columnsArr = [];
+
+            for (let i =0; i < currentGameBoard.length; i++) {
+                let column = [];
+
+                currentGameBoard.forEach((rowEl) => {
+                    column.push(rowEl[i]);
+                });
+
+                columnsArr.push(column);
+            }
+            columnsArr.forEach((col) => {
+                if (col.every(greaterZero) && col.every( el => el === col[0])) {console.log(gameOverMsg)}
+            })
+
+
+        })();
+
+        (function diagonalWin() {
+            if ( currentGameBoard[0][0] === currentGameBoard[1][1]
+                &&  currentGameBoard[0][0] === currentGameBoard[2][2]
+                && currentGameBoard[0][0] > 0) {
+                    console.log(gameOverMsg)
+                    return;
+                } else if (currentGameBoard[0][2] === currentGameBoard[1][1]
+                    &&  currentGameBoard[0][2] === currentGameBoard[2][0]
+                    && currentGameBoard[0][2] > 0) {
+                    console.log(gameOverMsg)
+                    return;
+                }
+        })();
+
+        (function tie() {
+            if( currentGameBoard[0].every(greaterZero) 
+            && currentGameBoard[1].every(greaterZero)
+            && currentGameBoard[2].every(greaterZero)) { 
+                console.log('Tie.');
+                return; 
+            }
+        })();
+
+        function gameOver() {
+            console.log(gameOverMsg);
+
+        }
+
+        // GameController().checkWinner()
+
+    };
+
     return {
         getCurrentPlayer,
         playRound,
-        switchPlayerTurn
+        switchPlayerTurn,
+        checkWinner
     }
 };
 

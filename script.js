@@ -36,10 +36,6 @@ function Gameboard() {
         console.log(board)
     }
 
-    board[0][0] = 1;
-    board[1][1] = 1;
-
-
     return {
         makeMove,
         printBoard,
@@ -110,6 +106,11 @@ function GameController(
     }
 
     const printNextRound = () => {
+        if(endOfGame = true) { 
+            currentPlayer = players[0];
+            return init();
+        }
+
         board.printBoard();
         playerTurnMessage();
     }
@@ -125,8 +126,7 @@ function GameController(
         for (let k = 0; k < currentGameBoard.length; k++) {    
             if( currentGameBoard[k].every( el => el === currentGameBoard[k][0])
             && currentGameBoard[k].every( el => el > 0) ) {
-                console.log(gameOverMsg);
-                return;
+                gameOver();
             }
         }
     })();
@@ -144,7 +144,9 @@ function GameController(
                 columnsArr.push(column);
             }
             columnsArr.forEach((col) => {
-                if (col.every(greaterZero) && col.every( el => el === col[0])) {console.log(gameOverMsg)}
+                if (col.every(greaterZero) && col.every( el => el === col[0])) {
+                    gameOver();
+                }
             })
 
 
@@ -154,12 +156,12 @@ function GameController(
             if ( currentGameBoard[0][0] === currentGameBoard[1][1]
                 &&  currentGameBoard[0][0] === currentGameBoard[2][2]
                 && currentGameBoard[0][0] > 0) {
-                    console.log(gameOverMsg)
+                    gameOver();
                     return;
                 } else if (currentGameBoard[0][2] === currentGameBoard[1][1]
                     &&  currentGameBoard[0][2] === currentGameBoard[2][0]
                     && currentGameBoard[0][2] > 0) {
-                    console.log(gameOverMsg)
+                    gameOver();
                     return;
                 }
         })();
@@ -168,25 +170,24 @@ function GameController(
             if( currentGameBoard[0].every(greaterZero) 
             && currentGameBoard[1].every(greaterZero)
             && currentGameBoard[2].every(greaterZero)) { 
-                console.log('Tie.');
+                gameOver();
                 return; 
             }
         })();
 
         function gameOver() {
             console.log(gameOverMsg);
-
+            endOfGame = true;
         }
-
-        // GameController().checkWinner()
-
     };
 
     return {
         getCurrentPlayer,
         playRound,
         switchPlayerTurn,
-        checkWinner
+        checkWinner,
+        printNextRound,
+        getBoard: board.getBoard // look more into this
     }
 };
 
@@ -201,5 +202,35 @@ function init() {
 
 init();
 
+function ScreenController() {
+
+    const game = GameController();
+    const slots = document.querySelectorAll('.slots');
+    const boardDiv = document.querySelector('board');
+    const turnDisplay = document.querySelectorAll('.turn');
+
+    
+    const updateScreen = () =>  {
+
+        boardDiv.textContent = "";
+
+        const board = game.getBoard();
+        const activePlayer = game.getCurrentPlayer();
+
+        turnDisplay.textContent = `${activePlayer.name}'s turn.`
+
+    };
+
+    function clickHandlerBoard() {
+        const selectedSlot = e.target
+    };
+
+    // return {
+    //     updateScreen,
+    //     clickHandlerBoard
+    // }
+};
+
+ScreenController();
 
 // const game = GameController();
